@@ -65,11 +65,8 @@ submit = st.button(
 )
 
 if submit:
-    print('-----------')
-    print(enteredDate)
     temp =  pd.DataFrame([[enteredDate,enteredName,enteredWeight]], columns=records.columns)
     records.date = pd.to_datetime(records.date).dt.strftime('%Y-%m-%d')
-    print(records.date)
     records = pd.concat([records, temp], ignore_index=True)
     records.to_csv('weight_record.csv', index=False)
     st.experimental_rerun()
