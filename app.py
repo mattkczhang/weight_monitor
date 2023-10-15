@@ -3,12 +3,16 @@ import pandas as pd
 from datetime import date
 import streamlit as st
 import altair as alt
+from streamlit_gsheets import GSheetsConnection
+
+conn = st.experimental_connection("gsheets", type=GSheetsConnection)
+# conn.create(worksheet='weight_record', data = pd.read_csv('weight_record.csv'))
 
 # load data
 
-records = pd.read_csv('weight_record.csv')
+records = conn.read(worksheet='weight_record')
 records.date = pd.to_datetime(records.date).dt.strftime('%Y-%m-%d')
-
+print(records)
 # records.drop(records.index, inplace=True)
 # records.to_csv('weight_record.csv', index=False)
 
@@ -68,11 +72,10 @@ if submit:
     temp =  pd.DataFrame([[enteredDate,enteredName,enteredWeight]], columns=records.columns)
     records.date = pd.to_datetime(records.date).dt.strftime('%Y-%m-%d')
     records = pd.concat([records, temp], ignore_index=True)
-    records.to_csv('weight_record.csv', index=False)
+    conn.update(worksheet="weight_record", data=records)
+    st.cache_data.clear()
     st.experimental_rerun()
 
-
-records.date = pd.to_datetime(records.date).dt.strftime('%Y-%m-%d')
 
 tab1, tab2 = st.tabs(["📈 Trend", "🗃 Data"])
 
